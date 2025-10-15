@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./back-end
+        working-directory: back-end
     steps:
       - name: Install scanning tools
         run: |
