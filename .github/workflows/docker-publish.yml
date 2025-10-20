@@ -34,7 +34,7 @@ jobs:
 
       - name: Push Docker image
         run: |
-          IMAGE_NAME=ghcr.io/${{ github.repository_owner | tr '[:upper:]' '[:lower:]' }}/python-app
+          IMAGE_NAME=ghcr.io/$(echo $GITHUB_REPOSITORY_OWNER | tr '[:upper:]' '[:lower:]')/python-app
           TAG=${{ github.sha }}
           docker push $IMAGE_NAME:$TAG
           docker push $IMAGE_NAME:latest
