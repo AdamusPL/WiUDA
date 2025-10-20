@@ -27,7 +27,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          echo "gh_repo_owner_lc=${GITHUB_REPOSITORY_OWNER##*/}" | tr '[:upper:]' '[:lower:]' >> $GITHUB_ENV
+          echo "gh_repo_owner_lc=${GITHUB_REPOSITORY_OWNER,,}" | tr '[:upper:]' '[:lower:]' >> $GITHUB_ENV
           IMAGE_NAME=ghcr.io/${{ env.gh_repo_owner_lc }}/python-app
           TAG=${{ github.sha }}
           docker build -t $IMAGE_NAME:$TAG .
