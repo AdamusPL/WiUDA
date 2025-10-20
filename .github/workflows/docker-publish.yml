@@ -27,14 +27,15 @@ jobs:
 
       - name: Build Docker image
         run: |
-          IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/python-app
+          echo "gh_repo_owner_lc=${GITHUB_REPOSITORY_OWNER##*/}" | tr '[:upper:]' '[:lower:]' >> $GITHUB_ENV
+          IMAGE_NAME=ghcr.io/${{ env.gh_repo_owner_lc }}/python-app
           TAG=${{ github.sha }}
           docker build -t $IMAGE_NAME:$TAG .
           docker tag $IMAGE_NAME:$TAG $IMAGE_NAME:latest
 
       - name: Push Docker image
         run: |
-          IMAGE_NAME=ghcr.io/$(echo $GITHUB_REPOSITORY_OWNER | tr '[:upper:]' '[:lower:]')/python-app
+          IMAGE_NAME=ghcr.io/${{ env.gh_repo_owner_lc }}/python-app
           TAG=${{ github.sha }}
           docker push $IMAGE_NAME:$TAG
           docker push $IMAGE_NAME:latest
