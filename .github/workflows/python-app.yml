@@ -173,4 +173,6 @@ jobs:
           context: ./${{ matrix.service }}
           file: ./${{ matrix.service }}/Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: |
+            ghcr.io/${{ github.actor }}/WiUDA:${{ matrix.service }}-latest
+            ghcr.io/${{ github.actor }}/WiUDA:${{ matrix.service }}-${{ github.sha }}
