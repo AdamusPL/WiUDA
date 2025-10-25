@@ -138,7 +138,7 @@ jobs:
         
       - name: Test Secrets
         env:
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_USER: ${{ vars.POSTGRES_USER }}
         run: |
           echo "Postgres user is: $POSTGRES_USER"
 
