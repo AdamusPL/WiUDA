@@ -181,5 +181,5 @@ jobs:
           file: ./${{ matrix.service }}/Dockerfile
           push: true
           tags: |
-            ghcr.io/adamuspl/wiuda:${{ matrix.service }}-latest
-            ghcr.io/adamuspl/wiuda:${{ matrix.service }}-${{ github.sha }}
+            ghcr.io/adamuspl/wiuda-${{ matrix.service }}:latest
+            ghcr.io/adamuspl/wiuda-${{ matrix.service }}:${{ github.sha }}
