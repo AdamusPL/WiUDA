@@ -1,0 +1,20 @@
+# Dokumentacja
+## python-app.yml
+Workflow uruchamia się wtedy i tylko wtedy gdy nastąpi jakaś zmiana w folderze 'back-end' lub 'front-end' na branchu 'master' po "spushowaniu" zmian, bądź zostanie utworzony Pull Request z dowolnej gałęzi do gałęzi 'main' w którym ulegnie zmiana zawartości katalogów 'back-end' lub 'front-end'. Parametr 'workflow_dispatch' umożliwia ręczne uruchomienie workflow z zakładki Actions, za pomocą przycisku. Skanowanie podatności kodu odbywa się za pomocą narzędzia Bandit oraz pip-audit.
+Linting sprawdza automatycznie kod źródłowy pod względem błędów programistycznych i stylistycznych. Jest on realizowany za pomocą narzędzia Pythonowego, stąd potrzeba wcześniejszej konfiguracji Pythona.
+Testy wykonują się na maszynie wirtualnej Ubuntu. Definiuje się tu tak zwaną macierz serwisów i dla każdego z jej elementów będą powtarzane zadeklarowane czynności testowe (będzie wykonywany job osobno dla każdego z serwisów). Tutaj znów trzeba skonfigurować Pythona (każdy job działa w izolowanym środowisku i nie dzieli ustawień z innymi jobami). Następuje instalacja dependencji, a następnie testy z pomocą narzędzia 'pytest'. 
+Kolejnym krokiem jest zbudowanie i spushowanie obrazu Dockerowego, dla każdego serwisu z osobna - back-end'u oraz front-end'u. Najpierw następuje logowanie do GitHub Container Registry. KOlejno deklaruje się użycie Docker Buildx. Buildx jest rozszerzeniem zwykłego "Docker Build", który dodatkowo umożliwia budowanie obrazu dla urządzeń z architekturami procesora: amd64 oraz arm64. Następnie określany jest katalog, z którego Docker będzie budował obraz (w tym przypadku dla każdego z katalogów - back-end oraz front-end - będzie szukał Dockerfile). Tagi obrazu w rejestrze charakteryzuje unikalny hash commita (zmienna github.sha). 
+
+## Dockerfile dla back-end'u
+Jako podstawowy obraz ustala się oficjalny od Pythona, z samym zainstalowanym Pythonem, bez pakietów. Potem ustala się katalog roboczy, w tym przypadku: "/app", jeśli nie istnieje - zostanie utworzony. Kopiowane są pliki requirements.txt z lokalnego projektu do wnętrza obrazu. Następnie instalowane są dependecje dla aplikacji, ustalone w poprzednio wymienionych plikach. Dodatkowa flaga --no-cache-dir sprawia, że pip nie zachowuje lokalnych kopii pakietów. Dzięki temu waga obrazu się zmniejsza. Kolejno kopiowane są wszystkie pliki z rozszerzeniem .py oraz katalog resources wraz z zawartością z lokalnego katalogu. Następnie ustala się port, na którym będzie działać kontener (tutaj: 5000). Na koniec, określane jest domyślne polecenie, które ma być wywołane przy starcie kontenera. W tym przypadku, sama aplikacja zostanie uruchomiona.
+
+## Dockerfile dla front-end'u
+Dla front-end'u sytuacja jest podobna jak w przypadku Dockerfile'a dla back-end'u. Dodatkowo kopiowane są katalogi utils, templates i static do foldera /app w kontenerze. Tutaj omijany jest katalog /resources, który oczywiście nie istnieje. 
+
+## docker-compose.yaml
+Pozwala uruchomić wielokontenerową aplikację jedną komendą. Kontener "postgres" używa oficjalnego obrazu Dockerowego dla PostgreSQL z DockerHub. Następnie ustawia zmienne środowiskowe, w celu autoryzacji z bazą danych. Następnie port wewnątrz kontenera jest mapowany na port lokalny.
+Dla back-end'u: obraz jest budowany na miejscu, a nie pobierany z DockerHub. Następnie określany jest katalog, z którego mają być pobrane pliki do budowania oraz lokalizacja Dockerfile, w którym znajduje się instrukcja budowania obrazu. Mapowany jest też znów port wewnątrz kontenera na port lokalny, który umożliwi dostęp do API. Wczytywane są zmienne środowiskowe z pliku .env, który musi istnieć. Zadeklarowane jest też to, że jeśli nie powiedzie się uruchomienie serwisu postgres, serwis backend nie uruchomi się.
+Dla front-end'u: podobnie jak w back-endzie. 
+
+
+Po uruchomieniu workflow, tworzy się pakiet w serwisie GitHub.
