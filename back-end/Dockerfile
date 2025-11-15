@@ -13,5 +13,7 @@ COPY ./resources .
 
 EXPOSE 5000
 
+ENV PYTHONPATH="${PYTHONPATH}:/app:/app/resources"
+
 CMD python app.py
 # CMD ["python", "app.py"]
