@@ -2,16 +2,14 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-COPY requirements.txt .
-COPY requirements_test.txt .
+COPY requirements.txt ./
 
 RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install --no-cache-dir -r requirements_test.txt
 
-COPY *.py .
-COPY ./utils .
-COPY ./templates .
-COPY ./static .
+COPY *.py ./
+COPY ./utils ./utils
+COPY ./templates ./templates
+COPY ./static ./static
 
 EXPOSE 8000
 
