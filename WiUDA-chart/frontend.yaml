@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: front-end-deployment
+  namespace: lazorko-czekalski
+  labels:
+    app: front-end
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: front-end
+  template:
+    metadata:
+      labels:
+        app: front-end
+    spec:
+      containers:
+      - name: front-end
+        image: ghcr.io/adamuspl/wiuda-front-end:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+        env:
+        - name: BACKEND_PORT
+          valueFrom:
+            secretKeyRef:
+              name: front-end-secret
+              key: BACKEND_PORT
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: front-end-secret
+              key: SECRET_KEY
+        - name: BACKEND_PORT
+          valueFrom:
+            secretKeyRef:
+              name: front-end-secret
+              key: BACKEND_PORT
+        - name: BACKEND_HOSTNAME
+          valueFrom:
+            secretKeyRef:
+              name: front-end-secret
+              key: BACKEND_HOSTNAME
+        # - containerPort: ${{ vars.BACKEND_PORT }}
+      imagePullSecrets:
+      - name: ghcr-creds
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: front-end-service
+spec:
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: front-end
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+      nodePort: 30000

@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: back-end-deployment
+  namespace: lazorko-czekalski
+  labels:
+    app: back-end
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: back-end
+  template:
+    metadata:
+      labels:
+        app: back-end
+    spec:
+      containers:
+      - name: back-end
+        image: ghcr.io/adamuspl/wiuda-back-end:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
+        env:
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_DB
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_PASSWORD
+        - name: JWT_KEY
+          valueFrom:
+            secretKeyRef:
+              name: back-end-secret
+              key: JWT_KEY
+        # - containerPort: ${{ vars.BACKEND_PORT }}
+      imagePullSecrets:
+      - name: ghcr-creds
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: back-end-service
+spec:
+  selector:
+    app.kubernetes.io/name: back-end
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
