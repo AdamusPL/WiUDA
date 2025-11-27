@@ -3,7 +3,28 @@
 # Declare variables to be passed into your templates.
 
 # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
-replicaCount: 1
+frontend:
+  replicaCount: 3
+
+  image:
+    repository: ghcr.io/adamuspl/wiuda-front-end
+    tag: "latest"
+    pullPolicy: IfNotPresent
+backend:
+  replicaCount: 3
+
+  image:
+    repository: ghcr.io/adamuspl/wiuda-back-end
+    tag: "latest"
+    pullPolicy: IfNotPresent
+database:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: postgres
+    tag: "14"
+    pullPolicy: IfNotPresent
 
 # This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
 image:
@@ -22,9 +43,9 @@ fullnameOverride: ""
 # This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
 serviceAccount:
   # Specifies whether a service account should be created
-  create: true
+  create: false
   # Automatically mount a ServiceAccount's API credentials?
-  automount: true
+  automount: false
   # Annotations to add to the service account
   annotations: {}
   # The name of the service account to use.
@@ -78,23 +99,27 @@ ingress:
 # (see: https://gateway-api.sigs.k8s.io/guides/)
 httpRoute:
   # HTTPRoute enabled.
-  enabled: false
+  enabled: true
   # HTTPRoute annotations.
   annotations: {}
   # Which Gateways this Route is attached to.
   parentRefs:
-  - name: gateway
-    sectionName: http
-    # namespace: default
+  - name: wuda-ext  
+    namespace: gateway-api
+    sectionName: https
   # Hostnames matching HTTP header.
   hostnames:
-  - chart-example.local
+  # - chart-example.local
+  - xololt.wuda.vizards.it
   # List of rules and filters applied.
   rules:
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /headers
+    - matches:
+      - path:
+          type: PathPrefix
+          value: /
+      backendRefs:
+        - name: front-end-service
+          port: 8000
   #   filters:
   #   - type: RequestHeaderModifier
   #     requestHeaderModifier:
