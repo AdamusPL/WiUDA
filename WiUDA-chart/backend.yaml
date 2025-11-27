@@ -21,27 +21,11 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 5000
-        env:
-        - name: POSTGRES_DB
-          valueFrom:
-            secretKeyRef:
+        envFrom:
+          - secretRef:
               name: postgres-secret
-              key: POSTGRES_DB
-        - name: POSTGRES_USER
-          valueFrom:
-            secretKeyRef:
-              name: postgres-secret
-              key: POSTGRES_USER
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: postgres-secret
-              key: POSTGRES_PASSWORD
-        - name: JWT_KEY
-          valueFrom:
-            secretKeyRef:
+          - secretRef:
               name: back-end-secret
-              key: JWT_KEY
         # - containerPort: ${{ vars.BACKEND_PORT }}
       imagePullSecrets:
       - name: ghcr-creds
@@ -51,6 +35,7 @@ kind: Service
 metadata:
   name: back-end-service
 spec:
+  type: ClusterIP
   selector:
     app.kubernetes.io/name: back-end
   ports:
