@@ -192,10 +192,10 @@ jobs:
         curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
     - name: Check for issues in helmchart
-      run: helm lint WIUDA-chart
+      run: helm lint WiUDA-chart
 
     - name: Package chart
-      run: helm package WIUDA-chart
+      run: helm package WiUDA-chart
     
     - name: Log in to GitHub Container Registry for Helm
       run: |
