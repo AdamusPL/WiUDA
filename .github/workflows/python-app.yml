@@ -203,4 +203,4 @@ jobs:
 
     - name: Push chart to GHCR
       run: |
-        helm push ./wiuda-*.tgz oci://ghcr.io/adamuspl/charts
+        helm push ./WiUDA-chart-*.tgz oci://ghcr.io/adamuspl/charts
