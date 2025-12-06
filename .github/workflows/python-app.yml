@@ -7,6 +7,7 @@ on:
     paths:
       - 'back-end/**'
       - 'front-end/**'
+      - 'WiUDA-chart/**'
   pull_request:
     branches: [ "master" ]
     paths:
@@ -177,3 +178,29 @@ jobs:
           tags: |
             ghcr.io/adamuspl/wiuda-${{ matrix.service }}:latest
             ghcr.io/adamuspl/wiuda-${{ matrix.service }}:${{ github.sha }}
+
+  helm:
+    name: Package and Push Helm Chart
+    runs-on: ubuntu-latest
+    needs: build-and-push
+
+    steps:
+    - uses: actions/checkout@v5
+
+    - name: Install Helm
+      run: |
+        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+    - name: Check for issues in helmchart
+      run: helm lint WIUDA-chart
+
+    - name: Package chart
+      run: helm package WIUDA-chart
+    
+    - name: Log in to GitHub Container Registry for Helm
+      run: |
+        echo ${{ secrets.GITHUB_TOKEN }} | helm registry login ghcr.io --username ${{ github.actor }} --password-stdin
+
+    - name: Push chart to GHCR
+      run: |
+        helm push ./wiuda-*.tgz oci://ghcr.io/adamuspl/charts
