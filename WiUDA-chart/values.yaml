@@ -5,13 +5,28 @@
 # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
 frontend:
   replicaCount: 3
+  containerPort: 8000
+  appHost: "0.0.0.0"
+  appPort: 8000
 
   image:
     repository: ghcr.io/adamuspl/wiuda-front-end
     tag: "latest"
     pullPolicy: IfNotPresent
+
+  env:
+    - name: SECRET_KEY
+      valueFrom:
+        secretKeyRef:
+          name: frontend-secret
+          key: SECRET_KEY
+    - name: BACKEND_HOSTNAME
+      value: back-end-service
+    - name: BACKEND_PORT
+      value: "5000"
 backend:
   replicaCount: 3
+  containerPort: 5000
 
   image:
     repository: ghcr.io/adamuspl/wiuda-back-end
@@ -152,11 +167,19 @@ resources: {}
 livenessProbe:
   httpGet:
     path: /
-    port: http
+    port: 8000
+  initialDelaySeconds: 10
+  timeoutSeconds: 2
+  periodSeconds: 10
+  failureThreshold: 3
 readinessProbe:
   httpGet:
     path: /
-    port: http
+    port: 8000
+  initialDelaySeconds: 5
+  timeoutSeconds: 2
+  periodSeconds: 10
+  failureThreshold: 3
 
 # This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
 autoscaling:
