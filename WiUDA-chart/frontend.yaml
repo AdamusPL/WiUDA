@@ -32,9 +32,9 @@ kind: Service
 metadata:
   name: front-end-service
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
-    app.kubernetes.io/name: front-end
+    app: front-end
   ports:
     - protocol: TCP
       port: 8000

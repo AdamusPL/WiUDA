@@ -35,9 +35,9 @@ kind: Service
 metadata:
   name: back-end-service
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
-    app.kubernetes.io/name: back-end
+    app: back-end
   ports:
     - protocol: TCP
       port: 5000

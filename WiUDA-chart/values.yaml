@@ -21,9 +21,13 @@ frontend:
           name: frontend-secret
           key: SECRET_KEY
     - name: BACKEND_HOSTNAME
-      value: back-end-service
+      value: "127.0.0.1"
     - name: BACKEND_PORT
       value: "5000"
+    - name: HOST 
+      value: "0.0.0.0"
+    - name: PORT
+      value: "8000"
 backend:
   replicaCount: 3
   containerPort: 5000
@@ -32,6 +36,17 @@ backend:
     repository: ghcr.io/adamuspl/wiuda-back-end
     tag: "latest"
     pullPolicy: IfNotPresent
+
+  envFromSecrets:
+    - back-end-secret
+    - postgres-secret
+
+  env:
+    - name: POSTGRES_HOST
+      value: postgres-service
+    - name: POSTGRES_PORT
+      value: "5432"
+  
 database:
   enabled: true
   replicaCount: 1
@@ -88,7 +103,7 @@ securityContext: {}
 # This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
 service:
   # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
-  type: ClusterIP
+  type: NodePort
   # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
   port: 80
 
@@ -168,7 +183,7 @@ livenessProbe:
   httpGet:
     path: /
     port: 8000
-  initialDelaySeconds: 10
+  initialDelaySeconds: 30
   timeoutSeconds: 2
   periodSeconds: 10
   failureThreshold: 3
