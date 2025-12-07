@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: back-end-deployment
-  namespace: lazorko-czekalski
   labels:
     app: back-end
 spec:
@@ -35,7 +34,7 @@ kind: Service
 metadata:
   name: back-end-service
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: back-end
   ports:

@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: front-end-deployment
-  namespace: lazorko-czekalski
   labels:
     app: front-end
 spec:
@@ -32,7 +31,7 @@ kind: Service
 metadata:
   name: front-end-service
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: front-end
   ports:
